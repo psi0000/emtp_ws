@@ -1,0 +1,50 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/psi/psi_rmf/install/rmf_workcell_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_fleet_adapter/include/**",
+        "/home/psi/psi_rmf/install/rmf_task_ros2/include/**",
+        "/home/psi/psi_rmf/install/rmf_websocket/include/**",
+        "/home/psi/psi_rmf/install/rmf_visualization_schedule/include/**",
+        "/home/psi/psi_rmf/install/rmf_visualization_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_traffic_ros2/include/**",
+        "/home/psi/psi_rmf/install/rmf_task_sequence/include/**",
+        "/home/psi/psi_rmf/install/rmf_task/include/**",
+        "/home/psi/psi_rmf/install/rmf_battery/include/**",
+        "/home/psi/psi_rmf/install/rmf_traffic/include/**",
+        "/home/psi/psi_rmf/install/rmf_utils/include/**",
+        "/home/psi/psi_rmf/install/rmf_traffic_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_traffic_editor/include/**",
+        "/home/psi/psi_rmf/install/rmf_task_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_site_map_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_scheduler_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_robot_sim_common/include/**",
+        "/home/psi/psi_rmf/install/rmf_obstacle_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_building_sim_common/include/**",
+        "/home/psi/psi_rmf/install/rmf_lift_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_ingestor_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_fleet_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_door_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_dispenser_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_charger_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_building_map_msgs/include/**",
+        "/home/psi/psi_rmf/install/rmf_api_msgs/include/**",
+        "/home/psi/psi_rmf/install/psi_interfaces/include/**",
+        "/home/psi/psi_rmf/install/nlohmann_json_schema_validator_vendor/include/**",
+        "/opt/ros/humble/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ros2",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}
