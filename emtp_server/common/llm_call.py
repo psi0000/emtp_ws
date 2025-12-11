@@ -20,7 +20,7 @@ from openai import OpenAI, OpenAIError
 from langchain_core.messages import SystemMessage, HumanMessage
 
 # 프로젝트 내부 로깅 유틸 (질문에서 주신 그대로 사용)
-from Dynamics.method.common.token_survey import add_openai
+from common.token_survey import add_openai
 
 # ====== 설정 ======
 # "openai" | "gemini" | "ollama" | "openrouter_llama" | "groq_llama"
