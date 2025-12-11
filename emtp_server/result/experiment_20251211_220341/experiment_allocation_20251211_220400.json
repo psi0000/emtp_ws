@@ -1,0 +1,63 @@
+{
+  "allocation_counts": {
+    "R1": 10,
+    "R2": 14,
+    "R3": 11
+  },
+  "allocation_total": 35,
+  "allocation": {
+    "R1": [
+      "H4_fireextinguisher1",
+      "H4_fireextinguisher2",
+      "B4_fireextinguisher1",
+      "H5_fireextinguisher4",
+      "B3_fireextinguisher1",
+      "B2_fireextinguisher1",
+      "B1_fireextinguisher1",
+      "H5_fireextinguisher3",
+      "H5_fireextinguisher1",
+      "H5_fireextinguisher2"
+    ],
+    "R2": [
+      "C1_fireextinguisher1",
+      "H7_fireextinguisher1",
+      "H8_fireextinguisher1",
+      "H8_fireextinguisher2",
+      "H8_fireextinguisher3",
+      "H10_fireextinguisher1",
+      "H10_fireextinguisher3",
+      "H10_fireextinguisher2",
+      "H10_fireextinguisher4",
+      "H10_fireextinguisher5",
+      "H9_fireextinguisher1",
+      "H9_fireextinguisher2",
+      "H9_fireextinguisher3",
+      "H9_fireextinguisher4"
+    ],
+    "R3": [
+      "H1_fireextinguisher1",
+      "H1_fireextinguisher2",
+      "H1_fireextinguisher3",
+      "H1_fireextinguisher4",
+      "H2_fireextinguisher1",
+      "B5_fireextinguisher1",
+      "H3_fireextinguisher1",
+      "H6_fireextinguisher4",
+      "H6_fireextinguisher3",
+      "H6_fireextinguisher2",
+      "H6_fireextinguisher1"
+    ]
+  },
+  "path_len": {
+    "R1": 210.74,
+    "R2": 279.67,
+    "R3": 234.3
+  },
+  "paths": {
+    "R1": "H4_fireextinguisher1 -> H4_fireextinguisher2 -> B4_fireextinguisher1 -> H5_fireextinguisher4 -> B3_fireextinguisher1 -> B2_fireextinguisher1 -> B1_fireextinguisher1 -> H5_fireextinguisher3 -> H5_fireextinguisher1 -> H5_fireextinguisher2",
+    "R2": "C1_fireextinguisher1 -> H7_fireextinguisher1 -> H8_fireextinguisher1 -> H8_fireextinguisher2 -> H8_fireextinguisher3 -> H10_fireextinguisher1 -> H10_fireextinguisher3 -> H10_fireextinguisher2 -> H10_fireextinguisher4 -> H10_fireextinguisher5 -> H9_fireextinguisher1 -> H9_fireextinguisher2 -> H9_fireextinguisher3 -> H9_fireextinguisher4",
+    "R3": "H1_fireextinguisher1 -> H1_fireextinguisher2 -> H1_fireextinguisher3 -> H1_fireextinguisher4 -> H2_fireextinguisher1 -> B5_fireextinguisher1 -> H3_fireextinguisher1 -> H6_fireextinguisher4 -> H6_fireextinguisher3 -> H6_fireextinguisher2 -> H6_fireextinguisher1"
+  },
+  "total_time": 18.733,
+  "status": "success"
+}
