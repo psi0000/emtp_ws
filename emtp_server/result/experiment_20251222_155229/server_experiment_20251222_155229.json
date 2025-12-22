@@ -4,18 +4,8 @@
       "content": "initial_plan",
       "plan": {
         "R1": [
-          "H4_fireextinguisher1",
-          "H4_fireextinguisher2",
-          "H4_firehydrant1",
-          "B4_fireextinguisher1",
-          "H5_fireextinguisher4",
-          "B3_fireextinguisher1",
-          "B2_fireextinguisher1",
-          "B1_fireextinguisher1",
-          "H5_firehydrant1",
-          "H5_fireextinguisher3",
-          "H5_fireextinguisher1",
-          "H5_fireextinguisher2"
+          "WP1",
+          "WP2"
         ],
         "R2": [
           "C1_fireextinguisher1",

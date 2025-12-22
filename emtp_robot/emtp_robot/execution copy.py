@@ -9,23 +9,15 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped, Twist
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy ,ReliabilityPolicy
-import math
+
 
 class Execution(Node):
-    def __init__(self, robot_id: int):
+    def __init__(self):
         super().__init__("execution_node")
 
-        self.robot_id = robot_id
-        self.robot_key = f"R{robot_id}"
-        match self.robot_id:
-            case 1:
-                self.robot_name = "UGV1"
-            case 2:
-                self.robot_name = "UGV2"
-            case 3:
-                self.robot_name = "drone"
-            case _:
-                self.robot_name = "UGV1"
+        self.robot_key = "R1"
+        self.robot_name = "UGV1"
+
         self.waypoints = {
             "L1_delivery_charger1": (0.0, 0.0),
             "L1_delivery_charger2": (1.0, 0.0),
@@ -73,35 +65,42 @@ class Execution(Node):
         goal_qos = QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
 
         self.goal_pub = self.create_publisher(PoseStamped,"/R1/goal_pose",goal_qos)
-        self.cmd_pub = self.create_publisher(Twist,"/R1/cmd_vel",10)
-        self.complete_pub = self.create_publisher(TaskComplete,"/task_complete",10)
-        self.state_pub = self.create_publisher(FleetState, "/fleet_states", 10)
-        self.create_timer(0.1, self.publish_state)
-        self.create_timer(1, self.print_current_state)
 
+        self.cmd_pub = self.create_publisher(Twist,"/R1/cmd_vel",10)
         self.create_subscription(Odometry,"/R1/odom",self.odom_callback,odom_qos )
+        self.complete_pub = self.create_publisher(TaskComplete,"/task_complete",10)
         self.create_subscription(TaskRequest, "/task_pub", self.task_callback, 10)
         self.create_subscription(Cancel, "/cancel_robot", self.cancel_callback, 10)
+        self.state_pub = self.create_publisher(FleetState, "/fleet_states", 10)
         
+        self.create_timer(0.1, self.publish_state)
+        self.create_timer(0.1, self.print_current_state)
         self.get_logger().info(f"[{self.robot_name}] Ready")
     def check_triggers(self):
+        import math
 
         for trig in self.triggers:
             if trig["id"] in self.triggered_ids:
                 continue
+
             if self.pose_level != trig["level"]:
                 continue
+
             dist = math.hypot(
                 self.pose_x - trig["x"],
                 self.pose_y - trig["y"]
             )
+
             if dist <= trig["radius"]:
                 self.triggered_ids.add(trig["id"])
+
                 msg = String()
                 msg.data = trig["message"]
                 self.dynamic_pub.publish(msg)
 
-                self.get_logger().warn(f"[TRIGGER {trig['id']}] {trig['message']}")
+                self.get_logger().warn(
+                    f"[TRIGGER {trig['id']}] {trig['message']}"
+                )
     def publish_goal_pose(self, x, y):
         pose = PoseStamped()
         pose.header.frame_id = "map"
@@ -143,27 +142,25 @@ class Execution(Node):
         self.nav_goal_active = True
 
         self.get_logger().info(f"[START] {self.current_task}")
+
         self.publish_goal_pose(self.target_pos[0],self.target_pos[1])
-
-    
-    def stop_and_hold_position(self):
-
-        self.cmd_pub.publish(Twist())
-        self.publish_goal_pose(self.pose_x, self.pose_y)
-        self.nav_goal_active = False
-        self.target_pos = None
 
     def cancel_callback(self, msg: Cancel):
         if msg.cancel not in ["all", self.robot_key, self.robot_name]:
             return
+
         self.get_logger().warn(f"[{self.robot_name}] CANCEL received")
 
+        
+        self.cmd_pub.publish(Twist())
         self.pending_tasks.clear()
         self.current_task = ""
+        self.target_pos = None
+        self.nav_goal_active = False
         self.is_cancelled = True
-        self.stop_and_hold_position()
 
     def check_arrived(self):
+        import math
         if not self.nav_goal_active or self.target_pos is None:
             return False
 
@@ -174,21 +171,22 @@ class Execution(Node):
         return dist < self.arrival_threshold
     
     def publish_state(self):
-
+        # Nav2 완료 체크
         self.check_triggers()
         if self.check_arrived():
             self.get_logger().info(f"[ARRIVED] {self.current_task}")
-
+            self.cmd_pub.publish(Twist())
             if self.current_task not in self.completed_tasks:
                 self.completed_tasks.append(self.current_task)
-
             msg = TaskComplete()
             msg.robot_key = self.robot_key
             msg.completed_tasks = self.completed_tasks[:]
             self.complete_pub.publish(msg)
 
+            # 상태 초기화
             self.current_task = ""
-            self.stop_and_hold_position()
+            self.target_pos = None
+            self.nav_goal_active = False
             self.start_next_task()
 
         msg = FleetState()
@@ -220,21 +218,13 @@ class Execution(Node):
             f" completed_tasks: {self.completed_tasks}\n"
             "================================================"
         )
-import argparse
-
 def main(args=None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--id", type=int, default=1, help="Robot ID (1, 2, 3, ...)")
-    parsed_args, unknown = parser.parse_known_args()
-
-    rclpy.init(args=unknown)
-    node = Execution(robot_id=parsed_args.id)
-
+    rclpy.init(args=args)
+    node = Execution()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-
     node.destroy_node()
     rclpy.shutdown()
 

@@ -6,7 +6,7 @@ from ament_index_python.packages import get_package_share_directory
 from datetime import datetime
 from rclpy.node import Node
 from psi_interfaces.srv import AllocationResult, DynamicEvent
-from psi_interfaces.msg import FleetState,TaskRequest,Cancel
+from psi_interfaces.msg import FleetState,TaskRequest,Cancel,TaskComplete
 
 from std_msgs.msg import String
 import math
@@ -74,8 +74,35 @@ class AllocationServer(Node):
         self.latest_fleet_state = None
         self.fleet_timer = self.create_timer(0.5, self.process_fleet_state)
         print(f"[INIT] Allocation Server Ready")
+        self.create_subscription(
+            TaskComplete,
+            "/task_complete",
+            self.task_complete_callback,
+            10
+        )
         self.publish_complete_tasks()
-    
+    def task_complete_callback(self, msg: TaskComplete):
+        key = msg.robot_key
+        reported = list(msg.completed_tasks)
+        self.complete_tasks[key] = reported
+
+        # active task 정리 + 다음 task 할당
+        if key in self.active_tasks:
+            current = self.active_tasks[key]["current"]
+            if current in reported:
+                self.active_tasks.pop(key, None)
+
+                if self.robot_tasks.get(key):
+                    next_task = self.robot_tasks[key].pop(0)
+                    self.send_task(self.robot_map[key], next_task)
+                    self.active_tasks[key] = {
+                        "current": next_task,
+                        "status": "waiting"
+                    }
+
+        self.publish_complete_tasks()
+        self.auto_end_check()
+
     def load_path_matrix(self):
     # 설치된 패키지의 share 경로 가져오기
         package_share = get_package_share_directory('emtp_server')
@@ -200,11 +227,9 @@ class AllocationServer(Node):
                 self.plan_time_total += plan_duration
 
             def is_valid_path(seq):
-                # 1) 빈 리스트면 False
                 if not seq:
                     return False
                 
-                # 2) 내부 값이 빈 문자열/None/공백이면 False
                 for s in seq:
                     if s is None:
                         return False
@@ -228,13 +253,11 @@ class AllocationServer(Node):
                 "plan": copy.deepcopy(self.robot_tasks),        # pop 되기 전 순수 경로
                 "complete_tasks": copy.deepcopy(self.complete_tasks)
             }
-            # ----------------------------
 
             self.init_tasks()
             response.success = True
             self.dynamic_handled = False
 
-            # event_count는 기존 로직 유지
             if self.event_count == 0:
                 self.event_count += 1
 
@@ -268,8 +291,8 @@ class AllocationServer(Node):
 
     # ---------------- Fleet Callback ----------------
     def fleet_state_callback(self, msg: FleetState):
-        # 메시지만 저장 (heavy logic 금지)
         self.latest_fleet_state = msg
+
     def process_fleet_state(self):
         if getattr(self, "dynamic_handled", True):
             return
@@ -277,7 +300,6 @@ class AllocationServer(Node):
             return
 
         fleet_state = self.latest_fleet_state
-        POSITION_TOLERANCE = 10.0
         for robot_state in fleet_state.robots:
             robot_name = robot_state.name
             key = next((k for k, v in self.robot_map.items() if v == robot_name), None)
@@ -299,38 +321,14 @@ class AllocationServer(Node):
 
             current_id = robot_state.task_id
             status = task_info["status"]
-            current_waypoint = task_info["current"]
-            is_empty = (current_id is None or current_id == '')
+            is_empty = (not current_id)
+
             if status == "waiting" and is_empty:
-
-                target_pos = self.get_waypoint_location(current_waypoint)
-                print(f"Target pos: {target_pos}")
-                if target_pos:
-                    robot_level = robot_state.location.level_name
-                    is_same_level = (robot_level == target_pos['level'])
-
-                    dx = robot_state.location.x - target_pos['x']
-                    dy = robot_state.location.y - target_pos['y']
-                    distance = math.hypot(dx, dy)
-                    
-                    is_close_enough = (distance < POSITION_TOLERANCE)
-                    print(f"dx={dx:.3f}, dy={dy:.3f}, distance={distance:.3f}")
-
-                    if is_same_level and is_close_enough:
-                        print(f"[SKIP/DONE] {robot_name} is already near {current_waypoint} ({distance:.2f}m away). Forcing task completion.")
-                        task_info["status"] = "running" 
-                        continue
-                
                 if not task_info.get("resent", False):
-                    print(f"[RESEND] {robot_name} task not accepted. Resending once...")
-                    robot_name = self.robot_map[key]
-                    self.send_task(robot_name, current_waypoint)
+                    self.send_task(self.robot_map[key], task_info["current"])
                     task_info["resent"] = True
                 continue
 
-            # =======================================
-            # 2) 로봇이 task 수락함 → current_id != '' AND status='waiting'
-            # =======================================
             if status == "waiting" and not is_empty:
                 print(f"[ACCEPT] {robot_name} accepted task. Running now.")
                 task_info["status"] = "running"
@@ -338,54 +336,13 @@ class AllocationServer(Node):
                 task_info.pop("resent", None)
                 continue
 
-            # =======================================
-            # 3) 실행 중 → 계속 current_id != '' 
-            # =======================================
             if status == "running"  and not is_empty:
                 task_info["id"] = current_id
-                continue  # 그대로 진행
+                continue  
 
-            # =======================================
-            # 4) task 완료됨 → status='running'인데 current_id == ''
-            # =======================================
-            if status == "running" and is_empty:
-                done_task = task_info["current"]
-                print(f"[DONE] {robot_name} completed task: {done_task}")
-
-                # 기록
-                self.robots_pos[key] = done_task
-                if done_task not in self.complete_tasks[key]:
-                    self.complete_tasks[key].append(done_task)
-
-                self.publish_complete_tasks()
-
-                if key in self.robot_tasks:
-                    if self.robot_tasks[key] and self.robot_tasks[key][0] == done_task:
-                        self.robot_tasks[key].pop(0)
-                # 현재 active 끝
-                self.active_tasks.pop(key, None)
-
-                # 다음 task가 있으면 즉시 보내기
-                if self.robot_tasks[key]:
-                    next_task = self.robot_tasks[key].pop(0)
-                    robot_name = self.robot_map[key]
-                    self.send_task(robot_name, next_task)
-                    self.active_tasks[key] = {
-                        "current": next_task,
-                        "status": "waiting"
-                    }
-
-                continue
-
-        # 🔥 자동 END 체크
-        
-
-        self.publish_complete_tasks()
         self.print_active_tasks()
         self.auto_end_check()
-    # ----------------------------------------------------
-    # 🔥 자동 END 체크 함수
-    # ----------------------------------------------------
+
     def auto_end_check(self):
         if getattr(self, "dynamic_handled", True):
             return
@@ -541,9 +498,7 @@ class AllocationServer(Node):
         self.cancel_pub.publish(cancel_msg)
         print("[CANCEL] Sent cancel signal for all robots.")
 
-        if not self.event_cli.wait_for_service(timeout_sec=3.0):
-            print("[ERROR] Supervisor /event not available")
-            return
+        
 
         req = DynamicEvent.Request()
         payload = {
@@ -554,6 +509,10 @@ class AllocationServer(Node):
         self.plan_end_time = None
         self.plan_start_time = time.time()
         req.dynamic = json.dumps(payload, ensure_ascii=False)
+        print(f"req.dynamic: {req.dynamic}")
+        if not self.event_cli.wait_for_service(timeout_sec=3.0):
+            print("[ERROR] Supervisor /event not available")
+            return
         self.event_cli.call_async(req)
 
         self.robot_tasks.clear()

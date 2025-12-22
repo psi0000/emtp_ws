@@ -14,6 +14,7 @@ set(msg_files
   "msg/Location.msg"
   "msg/RobotState.msg"
   "msg/TaskRequest.msg"
+  "msg/TaskComplete.msg"
 )
 set(srv_files
   "srv/AllocationResult.srv"
