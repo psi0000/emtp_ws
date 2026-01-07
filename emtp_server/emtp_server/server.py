@@ -50,9 +50,9 @@ class AllocationServer(Node):
         self.path_matrix = self.load_path_matrix()
         # === 로봇 상태 관리 ===
         self.robot_map = {
-            "R1": "UGV1",
-            "R2": "UGV2",
-            "R3": "DOG1",
+            "R1": "robot1",
+            "R2": "robot2",
+            "R3": "robot3",
         }
         self.robot_tasks = {}
         self.active_tasks = {}
