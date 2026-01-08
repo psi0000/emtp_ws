@@ -24,7 +24,7 @@ class Execution(Node):
             "L1_delivery_charger2": (1.0, 0.0),
             "L1_delivery_charger3": (2.0, 0.0),
             "H4_fireextinguisher1": (135.30, -93.06),
-            "WP1": (9.74, 2.66),
+            "WP1": (9.58, 21.3),
             "WP2": (11.839999999999998, 21.86),
         }
         self.triggers = [
@@ -49,7 +49,7 @@ class Execution(Node):
         self.triggered_ids = set()
         self.pose_x = self.pose_y = self.pose_z = 0.0
         self.pose_level = "L1"
-
+	
         self.current_task = ""
         self.target_pos = None
         self.nav_goal_active = False
@@ -240,12 +240,11 @@ class Execution(Node):
     def print_current_state(self):
         self.get_logger().info(
             "\n"
-            "================ CURRENT STATE ================\n"
+            f"================ {self.robot_name.upper()} STATE ================\n"
             f" current_task: {self.current_task}\n"
             f" target_pos : {self.target_pos}\n"
             f" nav_active : {self.nav_goal_active}\n"
             f" pose       : x={self.pose_x:.2f}, y={self.pose_y:.2f}, z={self.pose_z:.2f}, level={self.pose_level}\n"
-            f" distance   : {self.dist:.2f}\n"
             f" completed_tasks: {self.completed_tasks}\n"
             "================================================"
         )
