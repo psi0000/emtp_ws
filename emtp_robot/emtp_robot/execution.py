@@ -8,9 +8,13 @@ from rclpy.action import ActionClient
 from psi_interfaces.msg import TaskRequest, Cancel, FleetState, RobotState, Location, TaskComplete
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped, Twist
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy ,ReliabilityPolicy
+from geometry_msgs.msg import Twist
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy 
 import math
+import os
+import yaml
+from visualization_msgs.msg import Marker, MarkerArray
+from geometry_msgs.msg import Point
 
 class Execution(Node):
     def __init__(self, robot_id: int):
@@ -19,32 +23,14 @@ class Execution(Node):
         self.robot_id = robot_id
         self.robot_key = f"R{robot_id}"
         self.robot_name = f"robot{self.robot_id}"
-        self.waypoints = {
-            "L1_delivery_charger1": (0.0, 0.0),
-            "L1_delivery_charger2": (1.0, 0.0),
-            "L1_delivery_charger3": (2.0, 0.0),
-            "H4_fireextinguisher1": (135.30, -93.06),
-            "WP1": (9.58, 21.3),
-            "WP2": (11.839999999999998, 21.86),
+        self.LEVEL_Z = {
+            "L1": 0.0,
+            "L2": 3.0
         }
-        self.triggers = [
-            {
-                "id": 1,
-                "level": "L1",
-                "x": 9.74,
-                "y": 2.66,
-                "radius": 2.0,
-                "message": "Inspect firehydrants before fire extinguishers."
-            },
-            {
-                "id": 2,
-                "level": "L1",
-                "x": 11.839999999999998,
-                "y": 21.86,
-                "radius": 2.0,
-                "message": "UGVs are not allowed to enter the seminar room."
-            }
-        ]
+
+        self.waypoints = self.load_waypoints()
+        self.triggers = self.load_triggers()
+
         self._goal_handle = None
         self.triggered_ids = set()
         self.pose_x = self.pose_y = self.pose_z = 0.0
@@ -77,7 +63,9 @@ class Execution(Node):
         self.dynamic_pub = self.create_publisher(
             String, "/dynamic_event", 10
         )
-
+        self.trig_marker_pub = self.create_publisher(
+            MarkerArray, "/trigger_markers", 1
+        )
         # --- Subscribers ---
         odom_qos = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
@@ -101,33 +89,134 @@ class Execution(Node):
         # --- Timers ---
         self.create_timer(0.1, self.publish_state)
         self.create_timer(1.0, self.print_current_state)
-
+        self.create_timer(1.0, self.publish_trigger_markers)
         self.get_logger().info(f"[{self.robot_name}] Ready")
+    
+    def publish_trigger_markers(self):
+        ma = MarkerArray()
+        now = self.get_clock().now().to_msg()
 
+        for i, trig in enumerate(self.triggers):
+            m = Marker()
+            m.header.frame_id = "map"
+            m.header.stamp = now
+            m.ns = "triggers"
+            m.id = i
+            m.action = Marker.ADD
+
+            if trig["type"] == "circle":
+                m.type = Marker.CYLINDER
+                m.pose.position.x = trig["x"]
+                m.pose.position.y = trig["y"]
+                m.pose.position.z = self.LEVEL_Z[trig["level"]]
+                m.scale.x = trig["radius"] * 2
+                m.scale.y = trig["radius"] * 2
+                m.scale.z = 0.1
+                m.color.b = 1.0
+                m.color.a = 0.3
+
+            elif trig["type"] == "line":
+                m.type = Marker.LINE_STRIP
+                m.scale.x = trig["threshold"] * 2
+                m.color.r = 1.0
+                m.color.a = 0.3
+
+                p1 = Point(x=trig["x1"], y=trig["y1"], z=self.LEVEL_Z[trig["level"]])
+                p2 = Point(x=trig["x2"], y=trig["y2"], z=self.LEVEL_Z[trig["level"]])
+                m.points = [p1, p2]
+
+            ma.markers.append(m)
+
+        self.trig_marker_pub.publish(ma)
+
+    def load_waypoints(self):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        wp_path = os.path.join(base_dir, "wp_list.yaml")
+
+        with open(wp_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        waypoints = {}
+        for name, info in data["waypoints"].items():
+            level = info["level"]
+            z = self.LEVEL_Z.get(level, 0.0)
+
+            waypoints[name] = (
+                float(info["x"]),
+                float(info["y"]),
+                float(z)
+            )
+        return waypoints
+    def load_triggers(self):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        trig_path = os.path.join(base_dir, "trig.yaml")
+
+        with open(trig_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        return data.get("triggers", [])
     def check_triggers(self):
-
         for trig in self.triggers:
             if trig["id"] in self.triggered_ids:
                 continue
             if self.pose_level != trig["level"]:
                 continue
-            dist = math.hypot(
-                self.pose_x - trig["x"],
-                self.pose_y - trig["y"]
-            )
-            if dist <= trig["radius"]:
-                self.triggered_ids.add(trig["id"])
-                msg = String()
-                msg.data = trig["message"]
-                self.dynamic_pub.publish(msg)
-                self.get_logger().warn(f"[TRIGGER {trig['id']}] {trig['message']}")
 
-    def send_nav2_goal(self, x, y):
+            ttype = trig.get("type", "circle")
+
+            # --- circle trigger ---
+            if ttype == "circle":
+                dist = math.hypot(
+                    self.pose_x - trig["x"],
+                    self.pose_y - trig["y"]
+                )
+                if dist <= trig["radius"]:
+                    self.triggered_ids.add(trig["id"])
+                    msg = String()
+                    msg.data = trig["message"]
+                    self.dynamic_pub.publish(msg)
+                    self.get_logger().warn(
+                        f"[TRIGGER {trig['id']}] {trig['message']}"
+                    )
+
+            # --- line trigger ---
+            elif ttype == "line":
+                x1, y1 = trig["x1"], trig["y1"]
+                x2, y2 = trig["x2"], trig["y2"]
+
+                # 점–선분 거리 (inline, 함수 안 만듦)
+                ax = self.pose_x - x1
+                ay = self.pose_y - y1
+                bx = x2 - x1
+                by = y2 - y1
+                blen2 = bx*bx + by*by
+
+                if blen2 == 0.0:
+                    d = math.hypot(self.pose_x - x1, self.pose_y - y1)
+                else:
+                    t = max(0.0, min(1.0, (ax*bx + ay*by) / blen2))
+                    proj_x = x1 + bx * t
+                    proj_y = y1 + by * t
+                    d = math.hypot(self.pose_x - proj_x, self.pose_y - proj_y)
+
+                if d <= trig["threshold"]:
+                    self.triggered_ids.add(trig["id"])
+                    msg = String()
+                    msg.data = trig["message"]
+                    self.dynamic_pub.publish(msg)
+                    self.get_logger().warn(
+                        f"[TRIGGER {trig['id']}] {trig['message']}"
+                    )
+
+    def send_nav2_goal(self, x, y, z):
         goal = NavigateToPose.Goal()
         goal.pose.header.frame_id = "map"
         goal.pose.header.stamp = self.get_clock().now().to_msg()
         goal.pose.pose.position.x = float(x)
         goal.pose.pose.position.y = float(y)
+        # 로봇 개만
+        if self.robot_id == 3:
+            goal.pose.pose.position.z = float(z)
         goal.pose.pose.orientation.w = 1.0
 
         self.nav_client.wait_for_server()
@@ -165,7 +254,7 @@ class Execution(Node):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
         self.pose_z = msg.pose.pose.position.z
-        self.pose_level = "L2" if self.pose_z > 10.0 else "L1"
+        self.pose_level = "L2" if self.pose_z >= self.LEVEL_Z["L2"] else "L1"
 
     def task_callback(self, msg: TaskRequest):
         if msg.robot_name != self.robot_name:
@@ -194,9 +283,9 @@ class Execution(Node):
         self.get_logger().info(f"[START] {self.current_task}")
         self.send_nav2_goal(
             self.target_pos[0],
-            self.target_pos[1]
+            self.target_pos[1],
+            self.target_pos[2]
         )
-
     
     def stop_and_hold_position(self):
 

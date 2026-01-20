@@ -1,4 +1,8 @@
 .vscode/
 log/
+<<<<<<< Updated upstream
 /emtp_server/log
+=======
+/emtp_server/log/
+>>>>>>> Stashed changes
 /emtp_server/result/

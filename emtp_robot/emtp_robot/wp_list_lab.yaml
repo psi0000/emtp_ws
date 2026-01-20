@@ -1,0 +1,13 @@
+waypoints:
+  WP3: #WP3
+    x: 2.8
+    y: 1.24
+    level: L1
+  WP2: #WP2
+    x: 1.57
+    y: 1.24
+    level: L1
+  WP1: #WP1
+    x: 0.62
+    y: 1.24
+    level: L1

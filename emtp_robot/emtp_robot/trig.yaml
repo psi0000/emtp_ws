@@ -1,0 +1,35 @@
+triggers:
+  #TODO 
+  - id: 1
+    type: circle
+    level: L1
+    x: 9.74
+    y: 2.66
+    radius: 2.0
+    message: "Inspect firehydrants before fire extinguishers."
+  
+  - id: 2
+    type: circle
+    level: L1
+    x: 43.00
+    y: 8.00
+    radius: 2.0
+    message: "Don't enter the H5 hallway."
+
+  - id: 3
+    type: circle
+    level: L2
+    x: 11.84
+    y: 21.86
+    radius: 2.0
+    message: "UGV2 is malfunctioning."
+  
+  - id: 4
+    type: line
+    level: L2
+    x1: 17.8
+    y1: 1.13
+    x2: 17.8
+    y2: 0.0
+    threshold: 1.0
+    message: "Don't enter the seminar room. It is currently in use."
