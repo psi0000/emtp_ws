@@ -7,7 +7,7 @@ from datetime import datetime
 from rclpy.node import Node
 from psi_interfaces.srv import AllocationResult, DynamicEvent
 from psi_interfaces.msg import FleetState,TaskRequest,Cancel,TaskComplete
-
+from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import String
 import math
 import yaml
@@ -80,6 +80,22 @@ class AllocationServer(Node):
             self.task_complete_callback,
             10
         )
+        self.task_wp_pub = self.create_publisher(
+            MarkerArray,
+            '/task_wp',
+            1
+        )
+        self.task_2F_wp_pub = self.create_publisher(
+            MarkerArray,
+            '/task_2F_wp',
+            1
+        )
+        self.task_3F_wp_pub = self.create_publisher(
+            MarkerArray,
+            '/task_3F_wp',
+            1
+        )
+        self.wp_timer = self.create_timer(1.0, self.publish_waypoints)
         self.publish_complete_tasks()
     def task_complete_callback(self, msg: TaskComplete):
         key = msg.robot_key
@@ -102,6 +118,43 @@ class AllocationServer(Node):
 
         self.publish_complete_tasks()
         self.auto_end_check()
+    def publish_waypoints(self):
+        task_wp = MarkerArray()
+        task_2F_wp = MarkerArray()
+        task_3F_wp = MarkerArray()
+        now = self.get_clock().now().to_msg()
+
+        for idx, (name, info) in enumerate(self.waypoint_coords.items()):
+            m = Marker()
+            m.header.frame_id = "map"
+            m.header.stamp = now
+            m.ns = "waypoints"
+            m.id = idx
+            m.type = Marker.SPHERE
+            m.action = Marker.ADD
+
+            m.pose.position.x = info["x"]
+            m.pose.position.y = info["y"]
+            m.scale.x = 1.0
+            m.scale.y = 1.0
+            m.scale.z = 1.0
+
+            m.color.r = 0.0
+            m.color.g = 1.0
+            m.color.b = 0.0
+            m.color.a = 1.0
+
+            if info["level"] == "L1":
+                m.pose.position.z = 0.0
+                task_2F_wp.markers.append(m)
+            else:
+                m.pose.position.z = 3.0
+                task_3F_wp.markers.append(m)
+            task_wp.markers.append(m)
+
+        self.task_wp_pub.publish(task_wp)
+        self.task_2F_wp_pub.publish(task_2F_wp)
+        self.task_3F_wp_pub.publish(task_3F_wp)
 
     def load_path_matrix(self):
     # 설치된 패키지의 share 경로 가져오기
