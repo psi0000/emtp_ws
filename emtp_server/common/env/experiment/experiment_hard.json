@@ -1,0 +1,381 @@
+{
+  "building": {
+    "building_id": 1,
+    "building_name": "Experiment",
+    "num_rooms": 13,
+    "num_objects": 14
+  },
+  "rooms": [
+    {
+      "room_id": "H1",
+      "room_name": "hallway",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        546.908,
+        2041.392,
+        10.0
+      ],
+      "connected_rooms": [
+        "H2"
+      ],
+      "objects": [
+        {
+          "object_name": "H1_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            395.064,
+            2023.468,
+            0.0
+          ],
+          "status": "pending"
+        },
+        {
+          "object_name": "H1_fireextinguisher2",
+          "class": "fireextinguisher",
+          "location": [
+            694.675,
+            2027.725,
+            0.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H2",
+      "room_name": "hallway",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        896.151,
+        2072.433,
+        10.0
+      ],
+      "connected_rooms": [
+        "H1",
+        "S1",
+        "H3"
+      ],
+      "objects": [
+        {
+          "object_name": "H2_firehydrant1",
+          "class": "firehydrant",
+          "location": [
+            860.631,
+            2162.563,
+            0.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H3",
+      "room_name": "hallway",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        1118.243,
+        2058.43,
+        10.0
+      ],
+      "connected_rooms": [
+        "H2",
+        "H4",
+        "H5"
+      ],
+      "objects": [
+        {
+          "object_name": "H3_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            1212.554,
+            2116.368,
+            0.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H4",
+      "room_name": "hallway",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        1174.128,
+        1778.238,
+        10.0
+      ],
+      "connected_rooms": [
+        "H3"
+      ],
+      "objects": [
+        {
+          "object_name": "H4_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            1213.66,
+            1855.652,
+            0.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H5",
+      "room_name": "hallway",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        1555.692,
+        1907.851,
+        10.0
+      ],
+      "connected_rooms": [
+        "H3"
+      ],
+      "objects": [
+        {
+          "object_name": "H5_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            1807.353,
+            1928.052,
+            0.0
+          ],
+          "status": "pending"
+        },
+        {
+          "object_name": "H5_fireextinguisher2",
+          "class": "fireextinguisher",
+          "location": [
+            1504.908,
+            1861.738,
+            0.0
+          ],
+          "status": "pending"
+        },
+        {
+          "object_name": "H5_firehydrant1",
+          "class": "firehydrant",
+          "location": [
+            1329.466,
+            1884.888,
+            0.0
+          ],
+          "status": "pending"
+        },
+        {
+          "object_name": "H5_firehydrant2",
+          "class": "firehydrant",
+          "location": [
+            1666.628,
+            1922.399,
+            0.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "S1",
+      "room_name": "stair",
+      "floor": "L1",
+      "node_constraints": [],
+      "room_center": [
+        925.56,
+        2044.302,
+        10.0
+      ],
+      "connected_rooms": [
+        "H2",
+        "S2"
+      ],
+      "objects": []
+    },
+    {
+      "room_id": "C1",
+      "room_name": "meeting room",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        758.178,
+        1973.133,
+        30.0
+      ],
+      "connected_rooms": [
+        "H6"
+      ],
+      "objects": [
+        {
+          "object_name": "C1_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            806.925,
+            1930.686,
+            20.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H6",
+      "room_name": "hallway",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        527.369,
+        2044.254,
+        30.0
+      ],
+      "connected_rooms": [
+        "H7",
+        "C1"
+      ],
+      "objects": []
+    },
+    {
+      "room_id": "H7",
+      "room_name": "hallway",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        894.382,
+        2072.435,
+        30.0
+      ],
+      "connected_rooms": [
+        "H6",
+        "S2",
+        "H8"
+      ],
+      "objects": [
+        {
+          "object_name": "H7_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            865.475,
+            2026.829,
+            20.0
+          ],
+          "status": "pending"
+        },
+        {
+          "object_name": "H7_firehydrant1",
+          "class": "firehydrant",
+          "location": [
+            855.575,
+            2101.271,
+            20.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "H8",
+      "room_name": "hallway",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        1120.413,
+        2054.384,
+        30.0
+      ],
+      "connected_rooms": [
+        "H7",
+        "H9",
+        "H10"
+      ],
+      "objects": []
+    },
+    {
+      "room_id": "H9",
+      "room_name": "hallway",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        1175.157,
+        1766.874,
+        30.0
+      ],
+      "connected_rooms": [
+        "H8"
+      ],
+      "objects": [
+        {
+          "object_name": "H9_fireextinguisher1",
+          "class": "fireextinguisher",
+          "location": [
+            1213.478,
+            1855.09,
+            20.0
+          ],
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "room_id": "S2",
+      "room_name": "stair",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        919.931,
+        2028.865,
+        30.0
+      ],
+      "connected_rooms": [
+        "H7",
+        "S1"
+      ],
+      "objects": []
+    },
+    {
+      "room_id": "H10",
+      "room_name": "hallway",
+      "floor": "L2",
+      "node_constraints": [],
+      "room_center": [
+        1348.952,
+        1908.037,
+        30.0
+      ],
+      "connected_rooms": [
+        "H8"
+      ],
+      "objects": [
+        {
+          "object_name": "H10_firehydrant1",
+          "class": "firehydrant",
+          "location": [
+            1317.142,
+            1888.475,
+            20.0
+          ],
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "edge_constraints": {
+    "H1-H2": [],
+    "H2-S1": [],
+    "H2-H3": [],
+    "H3-H4": [],
+    "H3-H5": [],
+    "S1-S2": [
+      "UAV only"
+    ],
+    "C1-H6": [],
+    "H6-H7": [],
+    "H7-S2": [],
+    "H7-H8": [],
+    "H8-H9": [],
+    "H8-H10": []
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "allocation_counts": {
+    "R1": 5,
+    "R2": 5,
+    "R3": 3
+  },
+  "allocation_total": 13,
+  "allocation": {
+    "R1": [
+      "H4_fireextinguisher1",
+      "H5_firehydrant1",
+      "H5_fireextinguisher2",
+      "H5_firehydrant2",
+      "H5_fireextinguisher1"
+    ],
+    "R2": [
+      "H10_firehydrant1",
+      "H9_fireextinguisher1",
+      "H7_fireextinguisher1",
+      "H7_firehydrant1",
+      "C1_fireextinguisher1"
+    ],
+    "R3": [
+      "H1_fireextinguisher1",
+      "H1_fireextinguisher2",
+      "H2_firehydrant1"
+    ]
+  },
+  "path_len": {
+    "R1": 900.39,
+    "R2": 1096.55,
+    "R3": 655.83
+  },
+  "paths": {
+    "R1": "H4_fireextinguisher1 -> H5_firehydrant1 -> H5_fireextinguisher2 -> H5_firehydrant2 -> H5_fireextinguisher1",
+    "R2": "H10_firehydrant1 -> H9_fireextinguisher1 -> H7_fireextinguisher1 -> H7_firehydrant1 -> C1_fireextinguisher1",
+    "R3": "H1_fireextinguisher1 -> H1_fireextinguisher2 -> H2_firehydrant1"
+  },
+  "total_time": 18.718,
+  "status": "success"
+}

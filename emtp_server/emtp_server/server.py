@@ -153,48 +153,21 @@ class AllocationServer(Node):
         return round(total, 2)
     
     def load_nav_graph_data(self):
-
-        # base = os.path.join(self.pkg_root, "common", "env",)
-        # graph_file = os.path.join(base, "experiment",  "0.yaml")
         package_share = get_package_share_directory('emtp_server')
-        graph_file = os.path.join(package_share, 'env', 'experiment', '0.yaml')
-
-        if not os.path.exists(graph_file):
-            self.get_logger().error(f"Navigation graph file not found: {graph_file}")
-            return {}
+        graph_file = os.path.join(package_share, 'env', 'experiment', 'wp_list.yaml')
 
         data = {}
 
-        try:
-            with open(graph_file, "r", encoding="utf-8") as f:
-                yaml_data = yaml.safe_load(f)
+        with open(graph_file, "r", encoding="utf-8") as f:
+            yaml_data = yaml.safe_load(f)
 
-            levels = yaml_data.get("levels", {})
+        for name, info in yaml_data["waypoints"].items():
+            data[name] = {
+                "x": float(info["x"]),
+                "y": float(info["y"]),
+                "level": info["level"],
+            }
 
-            for level_name, level_info in levels.items():
-                vertices = level_info.get("vertices", [])
-
-                for v in vertices:
-                    if not (isinstance(v, list) and len(v) >= 3):
-                        continue
-
-                    x = float(v[0])
-                    y = float(v[1])
-                    props = v[2] if isinstance(v[2], dict) else {}
-                    name = props.get("name", "").strip()
-
-                    if not name:
-                        continue
-
-                    data[name] = {
-                        "x": x,
-                        "y": y,
-                        "level": level_name,
-                    }
-
-        except Exception as e:
-            self.get_logger().error(f"[NAV] Error parsing nav graph: {e}")
-            return {}
         return data
     
     def find_nearest_waypoint(self, x, y, level):

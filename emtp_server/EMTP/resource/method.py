@@ -165,7 +165,7 @@ def _compute_reachable_rooms(G, scene, robot_types, start_key, room_of, df=None)
 
 def MVRP(objects, robots, environment="warehouse", scene=None, start_at=None, open_routes=True):
     import copy
-    env_dir = os.path.expanduser("~/emtp_ws/src/emtp_server/common/env/college")
+    env_dir = os.path.expanduser("~/emtp_ws/src/emtp_server/common/env/experiment")
     matrix_path = os.path.join(env_dir, "path_matrix.csv")
 
     df = pd.read_csv(matrix_path, index_col=0)

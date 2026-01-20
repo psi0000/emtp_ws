@@ -1,0 +1,21 @@
+{
+  "records": [
+    {
+      "ts": "2026-01-19 23:30:44",
+      "prompt_tokens": 438,
+      "completion_tokens": 41,
+      "total_tokens": 479
+    },
+    {
+      "ts": "2026-01-19 23:30:47",
+      "prompt_tokens": 7102,
+      "completion_tokens": 41,
+      "total_tokens": 7143
+    }
+  ],
+  "totals": {
+    "prompt_tokens": 7540,
+    "completion_tokens": 82,
+    "total_tokens": 7622
+  }
+}

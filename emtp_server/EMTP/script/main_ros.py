@@ -107,7 +107,7 @@ def save_plan_result(state, result_dir, elapsed_time):
 # -------------------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--environment", type=str, default="college")
+    parser.add_argument("--environment", type=str, default="experiment")
     parser.add_argument("--topic", type=str, default="fire")
     parser.add_argument("--level", type=str, default="hard")
     parser.add_argument("--task-type", type=str, default="test1")

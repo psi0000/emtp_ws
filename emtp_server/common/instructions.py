@@ -36,7 +36,7 @@ def make_instructions(
             ],
         },
 
-        ("college", "fire"): {
+        ("experiment", "fire"): {
             "test1": [
                 "Inspect all fire safety equipment"
             ],
@@ -88,7 +88,7 @@ def make_instructions(
     # ===== 3) 난이도 제약 =====
     DIFFICULTY_CONSTRAINTS: Dict[Tuple[str, str], Dict[str, List[str]]] = {
         ("warehouse", "fire"): {"easy": [""], "medium": [""], "hard": [""]},
-        ("college", "fire"): {"easy": [""], "medium": [""], "hard": [""]},
+        ("experiment", "fire"): {"easy": [""], "medium": [""], "hard": [""]},
     }
 
     # ===== 4) ROBOT RULES =====
@@ -98,7 +98,7 @@ def make_instructions(
             "medium": "heterogeneous2",
             "hard": "heterogeneous3"
         },
-        ("college", "fire"): {
+        ("experiment", "fire"): {
             "easy": "homogeneous",
             "medium": "heterogeneous2",
             "hard": "heterogeneous3"
