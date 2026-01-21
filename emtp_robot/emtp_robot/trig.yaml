@@ -1,12 +1,13 @@
 triggers:
   #TODO 
-  - id: 1
+  - id: 1  # test
     type: circle
     level: L1
-    x: 9.74
-    y: 2.66
+    x: 11.3
+    y: 0.516
     radius: 2.0
     message: "Inspect firehydrants before fire extinguishers."
+  
   
   - id: 2
     type: circle
@@ -27,9 +28,7 @@ triggers:
   - id: 4
     type: line
     level: L2
-    x1: 17.8
-    y1: 1.13
-    x2: 17.8
-    y2: 0.0
+    x: 17.8
+    y: 0.565
     threshold: 1.0
     message: "Don't enter the seminar room. It is currently in use."

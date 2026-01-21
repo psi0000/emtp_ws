@@ -125,7 +125,7 @@ def make_instructions(
     # ★★★  DYNAMIC MODE  — 너가 요구한 그대로 ★★★
     # =====================================================
     if evaluation == "dynamic":
-        instructions = ["Inspect all the fire extinguishers"]   # ★ 직접 지정
+        instructions = ["Inspect all fire safety equipment"]   # ★ 직접 지정
         robot_type = ROBOT_RULES.get(env_topic, {}).get(level_norm, "homogeneous")
         robot_list = ROBOT_SETS.get(robot_type, ["R1"])
         return instructions, [], robot_list     # ★ constraints = 빈 배열

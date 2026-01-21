@@ -406,19 +406,25 @@ class AllocationServer(Node):
 
     # ---------------- Print Active ----------------
     def print_active_tasks(self):
-        print("----- Active Tasks (DEBUG) -----")
+        snapshot = {
+            k: (v.get("current"), v.get("status"), v.get("id"))
+            if v else None
+            for k, v in self.active_tasks.items()
+        }
+
+        if hasattr(self, "_last_snapshot") and self._last_snapshot == snapshot:
+            return  # 변화 없으면 출력 안 함
+
+        self._last_snapshot = snapshot
+
+        print("----- Active Tasks -----")
         for k in self.robot_map.keys():
             active = self.active_tasks.get(k)
-
             if active:
-                status = active.get("status", "None")
-                task = active.get("current")
-                tid = active.get("id")
-                print(f"[{k}] task={task}, status={status}, id={tid}")
+                print(f"[{k}] task={active['current']}, status={active['status']}, id={active.get('id')}")
             else:
                 print(f"[{k}] task=None")
-
-        print("-------------------------------")
+        print("------------------------")
 
     
     # ---------------- Log ----------------

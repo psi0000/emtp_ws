@@ -21,7 +21,6 @@ setup(
     entry_points={
         'console_scripts': [
             'execution = emtp_robot.execution:main',
-            'go_task = emtp_robot.go_task:main',
      
         ],
     },

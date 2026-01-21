@@ -66,6 +66,9 @@ class Execution(Node):
         self.trig_marker_pub = self.create_publisher(
             MarkerArray, "/trigger_markers", 1
         )
+        self.target_pub = self.create_publisher(
+            Point, f"/{self.robot_name}/current_target",10
+        )
         # --- Subscribers ---
         odom_qos = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
@@ -115,15 +118,25 @@ class Execution(Node):
                 m.color.b = 1.0
                 m.color.a = 0.3
 
-            elif trig["type"] == "line":
-                m.type = Marker.LINE_STRIP
+            elif trig["type"] == "line":   # 이름은 유지해도 되고, "rect"로 바꿔도 됨
+                m.type = Marker.CUBE
+                m.pose.position.x = trig["x"]
+                m.pose.position.y = trig["y"]
+                m.pose.position.z = self.LEVEL_Z[trig["level"]]
+
+                # 네모 크기 (threshold 기준)
                 m.scale.x = trig["threshold"] * 2
-                m.color.r = 1.0
+                m.scale.y = trig["threshold"] * 2
+                m.scale.z = 1.2   
+
+                # 색상
+                m.color.b = 1.0
                 m.color.a = 0.3
 
-                p1 = Point(x=trig["x1"], y=trig["y1"], z=self.LEVEL_Z[trig["level"]])
-                p2 = Point(x=trig["x2"], y=trig["y2"], z=self.LEVEL_Z[trig["level"]])
-                m.points = [p1, p2]
+                m.pose.orientation.x = 0.0
+                m.pose.orientation.y = 0.0
+                m.pose.orientation.z = 0.0
+                m.pose.orientation.w = 1.0
 
             ma.markers.append(m)
 
@@ -215,8 +228,8 @@ class Execution(Node):
         goal.pose.pose.position.x = float(x)
         goal.pose.pose.position.y = float(y)
         # 로봇 개만
-        if self.robot_id == 3:
-            goal.pose.pose.position.z = float(z)
+        # if self.robot_id == 3:
+        #     goal.pose.pose.position.z = float(z)
         goal.pose.pose.orientation.w = 1.0
 
         self.nav_client.wait_for_server()
@@ -279,6 +292,11 @@ class Execution(Node):
         self.current_task = self.pending_tasks.pop(0)
         self.target_pos = self.waypoints[self.current_task]
         self.nav_goal_active = True
+        p = Point()
+        p.x = float(self.target_pos[0])
+        p.y = float(self.target_pos[1])
+        p.z = float(self.target_pos[2])
+        self.target_pub.publish(p)
 
         self.get_logger().info(f"[START] {self.current_task}")
         self.send_nav2_goal(
