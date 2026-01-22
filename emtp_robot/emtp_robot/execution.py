@@ -164,6 +164,10 @@ class Execution(Node):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         trig_path = os.path.join(base_dir, "trig.yaml")
 
+        if not os.path.exists(trig_path):
+            self.get_logger().warn("[트리거 실행 안함]")
+            return []
+
         with open(trig_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 

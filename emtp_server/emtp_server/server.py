@@ -135,9 +135,9 @@ class AllocationServer(Node):
 
             m.pose.position.x = info["x"]
             m.pose.position.y = info["y"]
-            m.scale.x = 1.0
-            m.scale.y = 1.0
-            m.scale.z = 1.0
+            m.scale.x = 0.5
+            m.scale.y = 0.5
+            m.scale.z = 0.5
 
             m.color.r = 0.0
             m.color.g = 1.0
@@ -145,10 +145,10 @@ class AllocationServer(Node):
             m.color.a = 1.0
 
             if info["level"] == "L1":
-                m.pose.position.z = 0.0
+                m.pose.position.z = -3.0
                 task_2F_wp.markers.append(m)
             else:
-                m.pose.position.z = 3.0
+                m.pose.position.z = 4.0
                 task_3F_wp.markers.append(m)
             task_wp.markers.append(m)
 

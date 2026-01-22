@@ -17,8 +17,8 @@ waypoints:
     y: -2.44
     level: L1
   H4_fireextinguisher1: 
-    x: 35.2
-    y: 8.89
+    x: 34.3
+    y: 9.56
     level: L1
   H5_firehydrant1: 
     x: 38.5
@@ -50,8 +50,8 @@ waypoints:
     y: 1.13
     level: L2
   H9_fireextinguisher1: 
-    x: 35.3
-    y: 9.34
+    x: 34.3
+    y: 9.56
     level: L2
   H10_firehydrant1: 
     x: 37.9
